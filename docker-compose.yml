@@ -1,8 +1,7 @@
-version: '3.1'
 services:
   database:
     container_name: api_database
-    image: postgres
+    image: postgres:16
     restart: always
     env_file:
       - .env
@@ -12,3 +11,14 @@ services:
       POSTGRES_DB: ${DATABASE_NAME}
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./initdb/postgresql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:
