@@ -1,11 +1,11 @@
 package com.takima.backskeleton.controllers;
 
+import com.takima.backskeleton.DTO.RegisterDto;
 import com.takima.backskeleton.DTO.UserDto;
 import com.takima.backskeleton.services.UserService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,5 +22,11 @@ public class UserController {
     @GetMapping("")
     public List<UserDto> findAll() {
         return userService.findAll();
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDto create(@Valid @RequestBody RegisterDto register) {
+        return userService.create(register);
     }
 }
