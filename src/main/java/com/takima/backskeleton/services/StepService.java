@@ -30,7 +30,7 @@ public class StepService {
     }
 
     public List<Step> findBySession(Integer sessionId) {
-        return stepDao.findBySessionIdOrderByStepOrderAsc(sessionId);
+        return stepDao.findBySession_SessionIdOrderByOrderAsc(sessionId);
     }
 
     public Step findById(Integer id) {
@@ -52,7 +52,7 @@ public class StepService {
 
         // 2. Deux étapes d'une même session ne peuvent pas avoir le même ordre (sinon 409)
         //    La base le refuserait aussi (uq_step_order), mais avec une erreur SQL peu lisible.
-        if (stepDao.existsBySessionIdAndStepOrder(request.sessionId(), request.stepOrder())) {
+        if (stepDao.existsBySession_SessionIdAndOrder(request.sessionId(), request.stepOrder())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Une étape d'ordre " + request.stepOrder() + " existe déjà dans cette session");
         }
@@ -72,7 +72,7 @@ public class StepService {
 
         // Si l'ordre change, le nouvel ordre ne doit pas être déjà pris
         boolean orderChanged = !step.getOrder().equals(request.stepOrder());
-        if (orderChanged && stepDao.existsBySessionIdAndStepOrder(
+        if (orderChanged && stepDao.existsBySession_SessionIdAndOrder(
                 step.getSession().getSessionId(), request.stepOrder())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Une étape d'ordre " + request.stepOrder() + " existe déjà dans cette session");
@@ -100,7 +100,7 @@ public class StepService {
         }
 
         // Règle 2 : une seule étape en cours à la fois dans une session
-        if (next == StepStatus.IN_PROGRESS && stepDao.existsBySessionIdAndStatus(
+        if (next == StepStatus.IN_PROGRESS && stepDao.existsBySession_SessionIdAndStatus(
                 step.getSession().getSessionId(), StepStatus.IN_PROGRESS)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Une autre étape est déjà en cours dans cette session");

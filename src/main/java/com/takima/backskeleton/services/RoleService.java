@@ -21,7 +21,7 @@ public class RoleService {
         return roleDao.findAll();
     }
 
-    public Role getById(Long id) {
+    public Role getById(Integer id) {
         return roleDao.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role introuvable"));
     }
@@ -34,14 +34,14 @@ public class RoleService {
     }
 
     @Transactional
-    public Role update(Long id, RoleDto dto) {
+    public Role update(Integer id, RoleDto dto) {
         Role role = getById(id);
         role.setRoleName(validateName(dto));
         return save(role);
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Role role = getById(id);
         try {
             roleDao.delete(role);

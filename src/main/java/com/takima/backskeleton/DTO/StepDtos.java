@@ -32,7 +32,7 @@ public final class StepDtos {
      */
     public record CreateRequest(
             @NotNull(message = "La session est obligatoire")
-            Long sessionId,
+            Integer sessionId,
 
             @NotNull(message = "L'ordre est obligatoire")
             @Min(value = 1, message = "L'ordre commence à 1")
@@ -86,8 +86,8 @@ public final class StepDtos {
      * Réponse complète : GET /api/steps/{id}, POST, PUT, PATCH
      */
     public record Response(
-            Long id,
-            Long sessionId,
+            Integer id,
+            Integer sessionId,
             Integer stepOrder,
             String name,
             String description,
@@ -101,7 +101,7 @@ public final class StepDtos {
      * Réponse allégée pour les listes : GET /api/steps?sessionId=3
      */
     public record SummaryResponse(
-            Long id,
+            Integer id,
             Integer stepOrder,
             String name,
             StepStatus status

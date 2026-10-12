@@ -22,7 +22,7 @@ import lombok.Setter;
 public class Session {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long sessionId;
+    private Integer sessionId;
     private String sessionName;
     @Enumerated(EnumType.STRING)
     private SessionStatus sessionStatus = SessionStatus.IN_PROGRESS;

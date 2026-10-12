@@ -21,7 +21,7 @@ public class SessionService {
         return sessionDao.findAll();
     }
 
-    public Session getById(Long id) {
+    public Session getById(Integer id) {
         return sessionDao.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Session introuvable"));
     }
@@ -39,7 +39,7 @@ public class SessionService {
     }
 
     @Transactional
-    public Session update(Long id, SessionDto dto) {
+    public Session update(Integer id, SessionDto dto) {
         Session session = getById(id);
         validateName(dto);
         session.setSessionName(dto.getSessionName().trim());
@@ -51,7 +51,7 @@ public class SessionService {
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(Integer id) {
         sessionDao.delete(getById(id));
     }
 

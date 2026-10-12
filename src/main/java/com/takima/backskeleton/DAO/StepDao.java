@@ -7,9 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface StepDao extends JpaRepository<Step, Integer> {
-    List<Step> findBySessionIdOrderByStepOrderAsc(Integer sessionId);
-    boolean existsBySessionIdOrderByStepOrderAsc(Integer sessionId);
-    boolean existsBySessionIdAndStepOrderAsc(Integer sessionId, Integer stepOrder);
-    boolean existsBySessionIdAndStepOrder(Long sessionId, Integer stepOrder);
-    boolean existsBySessionIdAndStatus(Long sessionId, StepStatus stepStatus);
+    List<Step> findBySession_SessionIdOrderByOrderAsc(Integer sessionId);
+    boolean existsBySession_SessionIdAndOrder(Integer sessionId, Integer order);
+    boolean existsBySession_SessionIdAndStatus(Integer sessionId, StepStatus stepStatus);
 }

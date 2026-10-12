@@ -22,7 +22,7 @@ public class SessionController {
     }
 
     @GetMapping("/{id}")
-    public Session getById(@PathVariable("id") Long id) {
+    public Session getById(@PathVariable("id") Integer id) {
         return sessionService.getById(id);
     }
 
@@ -33,13 +33,13 @@ public class SessionController {
     }
 
     @PutMapping("/{id}")
-    public Session update(@PathVariable("id") Long id, @RequestBody SessionDto dto) {
+    public Session update(@PathVariable("id") Integer id, @RequestBody SessionDto dto) {
         return sessionService.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") Long id) {
+    public void delete(@PathVariable("id") Integer id) {
         sessionService.delete(id);
     }
 }

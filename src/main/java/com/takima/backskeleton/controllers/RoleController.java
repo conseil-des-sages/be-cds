@@ -22,7 +22,7 @@ public class RoleController {
     }
 
     @GetMapping("/{id}")
-    public Role getById(@PathVariable("id") Long id) {
+    public Role getById(@PathVariable("id") Integer id) {
         return roleService.getById(id);
     }
 
@@ -33,13 +33,13 @@ public class RoleController {
     }
 
     @PutMapping("/{id}")
-    public Role update(@PathVariable("id") Long id, @RequestBody RoleDto dto) {
+    public Role update(@PathVariable("id") Integer id, @RequestBody RoleDto dto) {
         return roleService.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") Long id) {
+    public void delete(@PathVariable("id") Integer id) {
         roleService.delete(id);
     }
 }

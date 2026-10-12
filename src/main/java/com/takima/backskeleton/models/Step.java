@@ -21,7 +21,7 @@ public class Step {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "step_id")
-    private Long id;
+    private Integer id;
 
     @Column (name = "step_order")
     private Integer order;
