@@ -40,8 +40,7 @@ CREATE TABLE participant (
 CREATE TABLE `user` (
                         participant_id     INT          NOT NULL,
                         user_email         VARCHAR(255) NOT NULL,
-                        user_password_hash VARCHAR(255) NOT NULL,               -- hash (bcrypt/argon2), jamais en clair
-                        user_is_active     BOOLEAN      NOT NULL DEFAULT TRUE,
+                        user_password VARCHAR(255) NOT NULL,               -- hash (bcrypt/argon2), jamais en clair
                         user_last_login_at DATETIME         NULL,
                         role_id            INT          NOT NULL,
                         PRIMARY KEY (participant_id),
@@ -60,7 +59,6 @@ CREATE TABLE sage (
                       sage_max_tokens    INT          NOT NULL DEFAULT 1000,
                       sage_system_prompt TEXT         NOT NULL,
                       sage_description   VARCHAR(500)     NULL,               -- texte affiché au joueur
-                      sage_is_public     BOOLEAN      NOT NULL DEFAULT FALSE, -- partagé avec les autres joueurs
                       creator_id         INT              NULL,               -- NULL = sage de base, sinon joueur propriétaire
                       PRIMARY KEY (participant_id),
                       CONSTRAINT ck_sage_temperature CHECK (sage_temperature BETWEEN 0 AND 1),
