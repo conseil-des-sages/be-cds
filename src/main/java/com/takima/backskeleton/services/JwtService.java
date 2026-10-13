@@ -49,6 +49,15 @@ public class JwtService {
         return isValidTokenOfType(token, REFRESH_TOKEN_TYPE);
     }
 
+    public Integer getUserIdFromRefreshToken(String token) {
+        Claims claims = parseRefreshToken(token);
+        return Integer.valueOf(claims.getSubject());
+    }
+
+    public Date getExpirationFromRefreshToken(String token) {
+        return parseRefreshToken(token).getExpiration();
+    }
+
     private String generateToken(User user, String tokenType, long expirationMs, boolean includeRole) {
         if (user.getId() == null) {
             throw new IllegalArgumentException("L'utilisateur doit être enregistré avant de générer un token");
@@ -86,5 +95,17 @@ public class JwtService {
         } catch (JwtException | IllegalArgumentException exception) {
             return false;
         }
+    }
+
+    private Claims parseRefreshToken(String token) {
+        Jws<Claims> parsed = Jwts.parserBuilder()
+                .setSigningKey(signingKey)
+                .build()
+                .parseClaimsJws(token);
+        Claims claims = parsed.getBody();
+        if (!REFRESH_TOKEN_TYPE.equals(claims.get(TOKEN_TYPE_CLAIM, String.class))) {
+            throw new JwtException("Ce n'est pas un refresh token");
+        }
+        return claims;
     }
 }
