@@ -1,10 +1,13 @@
 package com.takima.backskeleton.services;
 
+import com.takima.backskeleton.DAO.RoleDao;
 import com.takima.backskeleton.DAO.UserDao;
+import com.takima.backskeleton.DTO.PatchUserDto;
 import com.takima.backskeleton.DTO.RegisterDto;
 import com.takima.backskeleton.DTO.UserDto;
 import com.takima.backskeleton.models.Role;
 import com.takima.backskeleton.models.User;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -15,11 +18,14 @@ import java.util.List;
 @Component
 public class UserService {
     private UserDao userDao;
+    private final RoleDao roleDao;
+
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserDao userDao, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserDao userDao, RoleDao roleDao,UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userDao = userDao;
+        this.roleDao = roleDao;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
     }
@@ -30,6 +36,15 @@ public class UserService {
                 .toList();
     }
 
+
+    public User findByIdUser(@NotBlank Integer userId) {
+        return userDao.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Utiliateur introuvouble"
+                ));
+    }
+
+
     public UserDto create (RegisterDto register) {
         if(userDao.existsByEmailUser(register.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Un email existe déjà bouffon va, chien que tu es, VOLEUR !! AU VOLEUR !! UN ARABE VEUT ENTREE DANS NOTRE ABSE DE DONNEES !!");
@@ -38,8 +53,26 @@ public class UserService {
         user.setName(register.getName());
         user.setEmailUser(register.getEmail());
         user.setPasswordUser(passwordEncoder.encode(register.getPassword()));
-        user.setRole(new Role());
+        Role role = roleDao.findByRoleName("USER");
+        if(role == null){
+            throw new IllegalStateException("Role introuvable dans la db !");
+        }
+        user.setRole(role);
         return userMapper.mapToDto(userDao.save(user));
-
     }
+
+    public UserDto patch (Integer idUser, PatchUserDto patchUserDto) {
+        User user = findByIdUser(idUser);
+        if (patchUserDto.getName() != null) {
+            user.setName(patchUserDto.getName());
+        }
+        return userMapper.mapToDto(userDao.save(user));
+    }
+
+    public void delete (Integer idUser){
+        User user = findByIdUser(idUser);
+        userDao.delete(user);
+    }
+
+
 }
