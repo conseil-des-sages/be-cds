@@ -37,6 +37,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{idUser}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Integer idUser) {
         userService.delete(idUser);
     }

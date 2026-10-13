@@ -7,7 +7,6 @@ import com.takima.backskeleton.DTO.RegisterDto;
 import com.takima.backskeleton.DTO.UserDto;
 import com.takima.backskeleton.models.Role;
 import com.takima.backskeleton.models.User;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,7 +21,6 @@ import java.util.Locale;
 public class UserService {
     private final UserDao userDao;
     private final RoleDao roleDao;
-
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -40,14 +38,14 @@ public class UserService {
                 .toList();
     }
 
-
-    public User findByIdUser(@NotBlank Integer userId) {
+    public User findByIdUser(Integer userId) {
+        if (userId == null || userId < 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'identifiant utilisateur est invalide.");
+        }
         return userDao.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Utiliateur introuvouble"
-                ));
+                        HttpStatus.NOT_FOUND, "Utilisateur " + userId + " introuvable."));
     }
-
 
     @Transactional
     public UserDto create(RegisterDto register) {
@@ -75,21 +73,22 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "L'utilisateur entre en conflit avec les données existantes.", exception);
         }
-
-        public UserDto patch (Integer idUser, PatchUserDto patchUserDto) {
-            User user = findByIdUser(idUser);
-            if (patchUserDto.getName() != null) {
-                user.setName(patchUserDto.getName());
-            }
-            return userMapper.mapToDto(userDao.save(user));
-        }
-
-        public void delete (Integer idUser){
-            User user = findByIdUser(idUser);
-            userDao.delete(user);
-        }
-
     }
 
+    @Transactional
+    public UserDto patch(Integer userId, PatchUserDto patchUserDto) {
+        if (patchUserDto == null || patchUserDto.getName() == null
+                || patchUserDto.getName().isBlank() || patchUserDto.getName().trim().length() > 100) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Le nom doit contenir entre 1 et 100 caractères.");
+        }
+        User user = findByIdUser(userId);
+        user.setName(patchUserDto.getName().trim());
+        return userMapper.mapToDto(userDao.save(user));
+    }
 
+    @Transactional
+    public void delete(Integer userId) {
+        userDao.delete(findByIdUser(userId));
+    }
 }

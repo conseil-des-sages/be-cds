@@ -1,9 +1,12 @@
 package com.takima.backskeleton.DTO;
 
-import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public class PatchUserDto {
 
+    @NotBlank(message = "Le nom est obligatoire.")
+    @Size(max = 100, message = "Le nom ne peut pas dépasser 100 caractères.")
     private String name;
 
     public PatchUserDto() {
