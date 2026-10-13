@@ -3,11 +3,11 @@ package com.takima.backskeleton.services;
 import com.takima.backskeleton.DAO.SageDao;
 import com.takima.backskeleton.DTO.SageDto;
 import com.takima.backskeleton.models.Sage;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Component
+@Service
 public class SageService {
     private final SageDao sageDao;
     private final SageMapper sageMapper;
@@ -23,8 +23,8 @@ public class SageService {
                 .toList();
     }
 
-    public List<SageDto> findSageWithNoCreator(){
-        return sageDao.findByCreatorIsNotNull().stream()
+    public List<SageDto> findSageWithoutCreator() {
+        return sageDao.findByCreatorIsNull().stream()
                 .map(sageMapper::mapToDto)
                 .toList();
     }

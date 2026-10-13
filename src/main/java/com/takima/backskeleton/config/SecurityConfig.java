@@ -1,6 +1,10 @@
 package com.takima.backskeleton.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,13 +15,17 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.io.IOException;
+import java.net.URI;
+
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            ObjectMapper objectMapper) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
@@ -25,8 +33,12 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint((request, response, exception) ->
-                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
+                        .authenticationEntryPoint((request, response, exception) -> writeProblem(
+                                request, response, objectMapper, HttpStatus.UNAUTHORIZED,
+                                "Authentification requise ou token invalide."))
+                        .accessDeniedHandler((request, response, exception) -> writeProblem(
+                                request, response, objectMapper, HttpStatus.FORBIDDEN,
+                                "Vous n'avez pas les droits nécessaires pour cette opération.")))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST,
@@ -41,5 +53,15 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
+    }
+
+    private void writeProblem(HttpServletRequest request, HttpServletResponse response,
+                              ObjectMapper objectMapper, HttpStatus status, String detail) throws IOException {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, detail);
+        problem.setTitle(status.getReasonPhrase());
+        problem.setInstance(URI.create(request.getRequestURI()));
+        response.setStatus(status.value());
+        response.setContentType("application/problem+json");
+        objectMapper.writeValue(response.getOutputStream(), problem);
     }
 }

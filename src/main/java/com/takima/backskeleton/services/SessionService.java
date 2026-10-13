@@ -69,7 +69,7 @@ public class SessionService {
     }
 
     private void validateName(SessionDto dto) {
-        if (dto.getSessionName() == null || dto.getSessionName().isBlank()
+        if (dto == null || dto.getSessionName() == null || dto.getSessionName().isBlank()
                 || dto.getSessionName().trim().length() > 150) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Le nom de la session doit contenir entre 1 et 150 caracteres");

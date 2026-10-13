@@ -1,7 +1,13 @@
 package com.takima.backskeleton.DTO;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class RoleDto {
     private Integer roleId;
+
+    @NotBlank(message = "Le nom du rôle est obligatoire.")
+    @Size(max = 50, message = "Le nom du rôle ne peut pas dépasser 50 caractères.")
     private String roleName;
 
     public RoleDto() {

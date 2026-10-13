@@ -27,6 +27,6 @@ public class SageController {
 
     @GetMapping("/no-creator")
     public List<SageDto> findNoCreator(){
-        return sageService.findSageWithNoCreator();
+        return sageService.findSageWithoutCreator();
     }
 }

@@ -1,11 +1,16 @@
 package com.takima.backskeleton.DTO;
 
 import com.takima.backskeleton.models.SessionStatus;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
 public class SessionDto {
     private Integer sessionId;
+
+    @NotBlank(message = "Le nom de la session est obligatoire.")
+    @Size(max = 150, message = "Le nom de la session ne peut pas dépasser 150 caractères.")
     private String sessionName;
     private SessionStatus sessionStatus;
     private LocalDateTime sessionCreatedAt;

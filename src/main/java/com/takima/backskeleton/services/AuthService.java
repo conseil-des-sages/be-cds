@@ -8,6 +8,7 @@ import com.takima.backskeleton.DTO.RefreshRequest;
 import com.takima.backskeleton.DTO.RegisterDto;
 import com.takima.backskeleton.models.Role;
 import com.takima.backskeleton.models.User;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,9 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterDto request) {
+        if (request == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le corps de la requête est obligatoire.");
+        }
         String email = normalizeEmail(request.getEmail());
         if (userDao.existsByEmailUser(email)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Impossible de créer le compte avec ces informations");
@@ -50,12 +54,21 @@ public class AuthService {
         user.setPasswordUser(passwordEncoder.encode(request.getPassword()));
         user.setRole(userRole);
 
-        User savedUser = userDao.save(user);
+        User savedUser;
+        try {
+            savedUser = userDao.saveAndFlush(user);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Impossible de créer le compte avec ces informations.", exception);
+        }
         return toAuthResponse(refreshTokenService.issueTokens(savedUser));
     }
 
     @Transactional
     public AuthResponse login(LoginRequest request) {
+        if (request == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le corps de la requête est obligatoire.");
+        }
         String email = normalizeEmail(request.getEmail());
         User user = userDao.findByEmailUser(email).orElse(null);
 
@@ -68,6 +81,9 @@ public class AuthService {
     }
 
     public AuthResponse refresh(RefreshRequest request) {
+        if (request == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le corps de la requête est obligatoire.");
+        }
         try {
             return toAuthResponse(refreshTokenService.rotateRefreshToken(request.getRefreshToken()));
         } catch (IllegalArgumentException exception) {
@@ -76,6 +92,9 @@ public class AuthService {
     }
 
     public void logout(RefreshRequest request) {
+        if (request == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le corps de la requête est obligatoire.");
+        }
         refreshTokenService.revokeRefreshToken(request.getRefreshToken());
     }
 

@@ -2,6 +2,7 @@ package com.takima.backskeleton.controllers;
 
 import com.takima.backskeleton.DTO.SessionDto;
 import com.takima.backskeleton.services.SessionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -27,12 +28,12 @@ public class SessionController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SessionDto create(@RequestBody SessionDto dto) {
+    public SessionDto create(@Valid @RequestBody SessionDto dto) {
         return sessionService.create(dto);
     }
 
     @PutMapping("/{id}")
-    public SessionDto update(@PathVariable("id") Integer id, @RequestBody SessionDto dto) {
+    public SessionDto update(@PathVariable("id") Integer id, @Valid @RequestBody SessionDto dto) {
         return sessionService.update(id, dto);
     }
 

@@ -30,6 +30,10 @@ public class StepService {
     }
 
     public List<Step> findBySession(Integer sessionId) {
+        if (!sessionDao.existsById(sessionId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Session " + sessionId + " introuvable");
+        }
         return stepDao.findBySession_SessionIdOrderByOrderAsc(sessionId);
     }
 
@@ -45,6 +49,16 @@ public class StepService {
 
     @Transactional
     public Step create(StepDtos.CreateRequest request) {
+        if (request == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le corps de la requête est obligatoire.");
+        }
+        if (request.sessionId() == null || request.stepOrder() == null
+                || request.stepOrder() < 1 || request.name() == null || request.name().isBlank()
+                || request.name().length() > 100 || request.description() == null
+                || request.description().isBlank() || request.description().length() > 500) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Les données de l'étape sont invalides.");
+        }
         // 1. La session doit exister (sinon 404)
         Session session = sessionDao.findById(request.sessionId())
                 .orElseThrow(() -> new ResponseStatusException(
@@ -68,6 +82,16 @@ public class StepService {
 
     @Transactional
     public Step update(Integer id, StepDtos.UpdateRequest request) {
+        if (request == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le corps de la requête est obligatoire.");
+        }
+        if (request.stepOrder() == null || request.stepOrder() < 1
+                || request.name() == null || request.name().isBlank() || request.name().length() > 100
+                || request.description() == null || request.description().isBlank()
+                || request.description().length() > 500) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Les données de l'étape sont invalides.");
+        }
         Step step = findById(id);   // réutilise la méthode du dessus : 404 si introuvable
 
         // Si l'ordre change, le nouvel ordre ne doit pas être déjà pris
@@ -86,6 +110,12 @@ public class StepService {
 
     @Transactional
     public Step updateStatus(Integer id, StepDtos.StatusUpdateRequest request) {
+        if (request == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le corps de la requête est obligatoire.");
+        }
+        if (request.status() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le statut est obligatoire.");
+        }
         Step step = findById(id);
         StepStatus current = step.getStatus();
         StepStatus next = request.status();

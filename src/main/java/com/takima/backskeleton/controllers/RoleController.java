@@ -2,6 +2,7 @@ package com.takima.backskeleton.controllers;
 
 import com.takima.backskeleton.DTO.RoleDto;
 import com.takima.backskeleton.services.RoleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -27,12 +28,12 @@ public class RoleController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RoleDto create(@RequestBody RoleDto dto) {
+    public RoleDto create(@Valid @RequestBody RoleDto dto) {
         return roleService.create(dto);
     }
 
     @PutMapping("/{id}")
-    public RoleDto update(@PathVariable("id") Integer id, @RequestBody RoleDto dto) {
+    public RoleDto update(@PathVariable("id") Integer id, @Valid @RequestBody RoleDto dto) {
         return roleService.update(id, dto);
     }
 
