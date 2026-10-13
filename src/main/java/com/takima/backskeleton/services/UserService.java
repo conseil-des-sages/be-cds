@@ -35,7 +35,7 @@ public class UserService {
 
     public UserDto create (RegisterDto register) {
         if(userDao.existsByEmailUser(register.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Un email existe déjà bouffon va, chien que tu es, VOLEUR !! AU VOLEUR !! UN ARABE VEUT ENTREE DANS NOTRE ABSE DE DONNEES !!");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email déja existant");
         };
         User user = new User();
         user.setName(register.getName());

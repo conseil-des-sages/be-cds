@@ -1,6 +1,5 @@
 package com.takima.backskeleton.controllers;
 
-import com.takima.backskeleton.models.Session;
 import com.takima.backskeleton.DTO.SessionDto;
 import com.takima.backskeleton.services.SessionService;
 import lombok.RequiredArgsConstructor;
@@ -17,23 +16,23 @@ public class SessionController {
     private final SessionService sessionService;
 
     @GetMapping
-    public List<Session> findAll() {
+    public List<SessionDto> findAll() {
         return sessionService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Session getById(@PathVariable("id") Integer id) {
+    public SessionDto getById(@PathVariable("id") Integer id) {
         return sessionService.getById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Session create(@RequestBody SessionDto dto) {
+    public SessionDto create(@RequestBody SessionDto dto) {
         return sessionService.create(dto);
     }
 
     @PutMapping("/{id}")
-    public Session update(@PathVariable("id") Integer id, @RequestBody SessionDto dto) {
+    public SessionDto update(@PathVariable("id") Integer id, @RequestBody SessionDto dto) {
         return sessionService.update(id, dto);
     }
 

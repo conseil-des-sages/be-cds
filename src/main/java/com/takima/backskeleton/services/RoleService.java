@@ -17,32 +17,31 @@ import java.util.List;
 public class RoleService {
     private final RoleDao roleDao;
 
-    public List<Role> findAll() {
-        return roleDao.findAll();
+    public List<RoleDto> findAll() {
+        return roleDao.findAll().stream().map(this::toResponse).toList();
     }
 
-    public Role getById(Integer id) {
-        return roleDao.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role introuvable"));
+    public RoleDto getById(Integer id) {
+        return toResponse(findRoleById(id));
     }
 
     @Transactional
-    public Role create(RoleDto dto) {
+    public RoleDto create(RoleDto dto) {
         Role role = new Role();
         role.setRoleName(validateName(dto));
-        return save(role);
+        return toResponse(save(role));
     }
 
     @Transactional
-    public Role update(Integer id, RoleDto dto) {
-        Role role = getById(id);
+    public RoleDto update(Integer id, RoleDto dto) {
+        Role role = findRoleById(id);
         role.setRoleName(validateName(dto));
-        return save(role);
+        return toResponse(save(role));
     }
 
     @Transactional
     public void delete(Integer id) {
-        Role role = getById(id);
+        Role role = findRoleById(id);
         try {
             roleDao.delete(role);
             roleDao.flush();
@@ -50,6 +49,15 @@ public class RoleService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Ce role est encore utilise", e);
         }
+    }
+
+    private Role findRoleById(Integer id) {
+        return roleDao.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role introuvable"));
+    }
+
+    private RoleDto toResponse(Role role) {
+        return new RoleDto(role.getRoleId(), role.getRoleName());
     }
 
     private Role save(Role role) {

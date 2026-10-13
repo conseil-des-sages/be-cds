@@ -17,17 +17,16 @@ import java.time.LocalDateTime;
 public class SessionService {
     private final SessionDao sessionDao;
 
-    public List<Session> findAll() {
-        return sessionDao.findAll();
+    public List<SessionDto> findAll() {
+        return sessionDao.findAll().stream().map(this::toResponse).toList();
     }
 
-    public Session getById(Integer id) {
-        return sessionDao.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Session introuvable"));
+    public SessionDto getById(Integer id) {
+        return toResponse(findSessionById(id));
     }
 
     @Transactional
-    public Session create(SessionDto dto) {
+    public SessionDto create(SessionDto dto) {
         validateName(dto);
         Session session = new Session();
         session.setSessionName(dto.getSessionName().trim());
@@ -35,24 +34,38 @@ public class SessionService {
             session.setSessionStatus(dto.getSessionStatus());
         }
         session.setSessionCreatedAt(LocalDateTime.now());
-        return sessionDao.save(session);
+        return toResponse(sessionDao.save(session));
     }
 
     @Transactional
-    public Session update(Integer id, SessionDto dto) {
-        Session session = getById(id);
+    public SessionDto update(Integer id, SessionDto dto) {
+        Session session = findSessionById(id);
         validateName(dto);
         session.setSessionName(dto.getSessionName().trim());
         if (dto.getSessionStatus() != null) {
             session.setSessionStatus(dto.getSessionStatus());
         }
         session.setSessionUpdatedAt(LocalDateTime.now());
-        return sessionDao.save(session);
+        return toResponse(sessionDao.save(session));
     }
 
     @Transactional
     public void delete(Integer id) {
-        sessionDao.delete(getById(id));
+        sessionDao.delete(findSessionById(id));
+    }
+
+    private Session findSessionById(Integer id) {
+        return sessionDao.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Session introuvable"));
+    }
+
+    private SessionDto toResponse(Session session) {
+        return new SessionDto(
+                session.getSessionId(),
+                session.getSessionName(),
+                session.getSessionStatus(),
+                session.getSessionCreatedAt(),
+                session.getSessionUpdatedAt());
     }
 
     private void validateName(SessionDto dto) {
