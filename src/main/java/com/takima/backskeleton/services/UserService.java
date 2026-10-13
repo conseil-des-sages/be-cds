@@ -2,10 +2,12 @@ package com.takima.backskeleton.services;
 
 import com.takima.backskeleton.DAO.RoleDao;
 import com.takima.backskeleton.DAO.UserDao;
+import com.takima.backskeleton.DTO.PatchUserDto;
 import com.takima.backskeleton.DTO.RegisterDto;
 import com.takima.backskeleton.DTO.UserDto;
 import com.takima.backskeleton.models.Role;
 import com.takima.backskeleton.models.User;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,16 +21,17 @@ import java.util.Locale;
 @Service
 public class UserService {
     private final UserDao userDao;
+    private final RoleDao roleDao;
+
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final RoleDao roleDao;
 
     public UserService(UserDao userDao, UserMapper userMapper,
                        PasswordEncoder passwordEncoder, RoleDao roleDao) {
         this.userDao = userDao;
+        this.roleDao = roleDao;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
-        this.roleDao = roleDao;
     }
 
     public List<UserDto> findAll() {
@@ -36,6 +39,15 @@ public class UserService {
                 .map(userMapper::mapToDto)
                 .toList();
     }
+
+
+    public User findByIdUser(@NotBlank Integer userId) {
+        return userDao.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Utiliateur introuvouble"
+                ));
+    }
+
 
     @Transactional
     public UserDto create(RegisterDto register) {
@@ -63,5 +75,21 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "L'utilisateur entre en conflit avec les données existantes.", exception);
         }
+
+        public UserDto patch (Integer idUser, PatchUserDto patchUserDto) {
+            User user = findByIdUser(idUser);
+            if (patchUserDto.getName() != null) {
+                user.setName(patchUserDto.getName());
+            }
+            return userMapper.mapToDto(userDao.save(user));
+        }
+
+        public void delete (Integer idUser){
+            User user = findByIdUser(idUser);
+            userDao.delete(user);
+        }
+
     }
+
+
 }

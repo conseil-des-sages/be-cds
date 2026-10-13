@@ -1,5 +1,6 @@
 package com.takima.backskeleton.controllers;
 
+import com.takima.backskeleton.DTO.PatchUserDto;
 import com.takima.backskeleton.DTO.RegisterDto;
 import com.takima.backskeleton.DTO.UserDto;
 import com.takima.backskeleton.services.UserService;
@@ -28,5 +29,15 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto create(@Valid @RequestBody RegisterDto register) {
         return userService.create(register);
+    }
+
+    @PatchMapping("/{idUser}")
+    public UserDto update(@PathVariable Integer idUser, @Valid @RequestBody PatchUserDto patchUserDto) {
+        return userService.patch(idUser, patchUserDto);
+    }
+
+    @DeleteMapping("/{idUser}")
+    public void delete(@PathVariable Integer idUser) {
+        userService.delete(idUser);
     }
 }
