@@ -54,6 +54,15 @@ public class JwtService {
         return Integer.valueOf(claims.getSubject());
     }
 
+    public Integer getUserIdFromAccessToken(String token) {
+        Claims claims = parseAccessToken(token);
+        return Integer.valueOf(claims.getSubject());
+    }
+
+    public String getRoleFromAccessToken(String token) {
+        return parseAccessToken(token).get("role", String.class);
+    }
+
     public Date getExpirationFromRefreshToken(String token) {
         return parseRefreshToken(token).getExpiration();
     }
@@ -105,6 +114,18 @@ public class JwtService {
         Claims claims = parsed.getBody();
         if (!REFRESH_TOKEN_TYPE.equals(claims.get(TOKEN_TYPE_CLAIM, String.class))) {
             throw new JwtException("Ce n'est pas un refresh token");
+        }
+        return claims;
+    }
+
+    private Claims parseAccessToken(String token) {
+        Jws<Claims> parsed = Jwts.parserBuilder()
+                .setSigningKey(signingKey)
+                .build()
+                .parseClaimsJws(token);
+        Claims claims = parsed.getBody();
+        if (!ACCESS_TOKEN_TYPE.equals(claims.get(TOKEN_TYPE_CLAIM, String.class))) {
+            throw new JwtException("Ce n'est pas un access token");
         }
         return claims;
     }
