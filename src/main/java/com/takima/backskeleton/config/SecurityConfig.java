@@ -2,6 +2,7 @@ package com.takima.backskeleton.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -40,15 +41,19 @@ public class SecurityConfig {
                                 request, response, objectMapper, HttpStatus.FORBIDDEN,
                                 "Vous n'avez pas les droits nécessaires pour cette opération.")))
                 .authorizeHttpRequests(authorize -> authorize
+                        // La fin d'un flux SSE repasse par ces filtres, sans jeton : l'accès a déjà été vérifié.
+                        .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/register",
                                 "/api/auth/login",
                                 "/api/auth/refresh",
                                 "/api/auth/logout").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/roles", "/sessions").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/roles/**", "/sessions/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/roles/**", "/sessions/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/roles").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/roles/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/roles/**").hasRole("ADMIN")
+                        // Routes d'administration : un joueur passe par /api/me, /api/sages et /api/debates.
+                        .requestMatchers("/user/**", "/sessions/**", "/api/steps/**").hasRole("ADMIN")
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

@@ -1,6 +1,9 @@
 package com.takima.backskeleton.models;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -28,4 +31,11 @@ public class Session {
     private SessionStatus sessionStatus = SessionStatus.IN_PROGRESS;
     private LocalDateTime sessionCreatedAt;
     private LocalDateTime sessionUpdatedAt;
+    private String sessionQuestion;
+    private String sessionContext;
+    private String sessionTheme;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_owner_id")
+    private User owner;
 }

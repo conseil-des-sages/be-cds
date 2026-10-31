@@ -1,7 +1,7 @@
 -- =====================================================================
 -- Le Conseil des Sages - seed légère (PostgreSQL 16)
 --
--- À lancer après conseil_des_sages.sql, sur une base vide.
+-- Appliquée automatiquement par Flyway après V1.
 -- Contenu : 2 rôles, 1 joueur de démo, les 6 sages par défaut,
 --           1 session terminée en 3 rounds avec quelques messages.
 --
@@ -10,7 +10,6 @@
 
 
 
-START TRANSACTION;
 
 -- ---------------------------------------------------------------------
 -- Rôles
@@ -143,4 +142,3 @@ SELECT setval(pg_get_serial_sequence('step', 'step_id'), (SELECT MAX(step_id) FR
 
 SELECT setval(pg_get_serial_sequence('message', 'message_id'), (SELECT MAX(message_id) FROM message));
 
-COMMIT;

@@ -1,0 +1,7 @@
+.env
+.git
+.idea
+.github
+target
+img-readme
+*.log

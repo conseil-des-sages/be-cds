@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class JwtService {
@@ -76,6 +77,8 @@ public class JwtService {
         Date expiration = new Date(issuedAt.getTime() + expirationMs);
 
         var builder = Jwts.builder()
+                // Un identifiant unique : deux jetons émis dans la même seconde restent différents.
+                .setId(UUID.randomUUID().toString())
                 .setSubject(user.getId().toString())
                 .claim(TOKEN_TYPE_CLAIM, tokenType)
                 .setIssuedAt(issuedAt)
