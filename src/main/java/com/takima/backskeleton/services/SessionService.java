@@ -30,6 +30,7 @@ public class SessionService {
         validateName(dto);
         Session session = new Session();
         session.setSessionName(dto.getSessionName().trim());
+        session.setSessionQuestion(dto.getSessionName().trim());
         if (dto.getSessionStatus() != null) {
             session.setSessionStatus(dto.getSessionStatus());
         }

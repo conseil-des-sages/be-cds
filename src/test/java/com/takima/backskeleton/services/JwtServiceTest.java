@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JwtServiceTest {
@@ -26,6 +27,19 @@ class JwtServiceTest {
         assertFalse(jwtService.validateRefreshToken(accessToken));
         assertTrue(jwtService.validateRefreshToken(refreshToken));
         assertFalse(jwtService.validateAccessToken(refreshToken));
+    }
+
+    @Test
+    void twoTokensIssuedInTheSameSecondAreDifferent() {
+        JwtService jwtService = new JwtService(SECRET, 60_000, 60_000);
+        User user = new User();
+        user.setId(1);
+        user.setEmailUser("gab@example.com");
+        Role role = new Role();
+        role.setRoleName("USER");
+        user.setRole(role);
+
+        assertNotEquals(jwtService.generateRefreshToken(user), jwtService.generateRefreshToken(user));
     }
 
     @Test

@@ -1,10 +1,16 @@
 package com.takima.backskeleton.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "sage")
 @PrimaryKeyJoinColumn(name = "participant_id")
+@Getter
+@Setter
 public class Sage extends Participant{
 
     @Column(name = "sage_model")
@@ -25,6 +31,28 @@ public class Sage extends Participant{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id")
     private User creator;
+
+    @Column(name = "sage_short_name")
+    private String shortName;
+
+    @Column(name = "sage_color")
+    private String color = "futur";
+
+    @Column(name = "sage_icon")
+    private String icon = "sparkles";
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sage_kind")
+    private SageKind kind = SageKind.DEBATER;
+
+    @Column(name = "sage_is_public")
+    private boolean shared;
+
+    @Column(name = "sage_is_default")
+    private boolean inDefaultCouncil;
+
+    @Column(name = "sage_deleted_at")
+    private LocalDateTime deletedAt;
 
     public String getSageModel() {
         return sageModel;
