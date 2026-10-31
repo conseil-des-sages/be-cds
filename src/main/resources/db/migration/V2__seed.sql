@@ -1,16 +1,15 @@
 -- =====================================================================
--- Le Conseil des Sages - seed légère (MySQL 8)
+-- Le Conseil des Sages - seed légère (PostgreSQL 16)
 --
--- À lancer après conseil_des_sages.sql, sur une base vide.
+-- Appliquée automatiquement par Flyway après V1.
 -- Contenu : 2 rôles, 1 joueur de démo, les 6 sages par défaut,
 --           1 session terminée en 3 rounds avec quelques messages.
 --
 -- Compte de démo : demo@conseil.fr / demo1234
 -- =====================================================================
 
-USE conseil_des_sages;
 
-START TRANSACTION;
+
 
 -- ---------------------------------------------------------------------
 -- Rôles
@@ -24,20 +23,20 @@ INSERT INTO role (role_id, role_name) VALUES
 -- Participants (mère) : 1 joueur + 6 sages
 -- ---------------------------------------------------------------------
 
-INSERT INTO participant (participant_id, participant_name, participant_type) VALUES
-                                                                                 (1, 'Camille',             'USER'),
-                                                                                 (2, 'Le Prudent',          'SAGE'),
-                                                                                 (3, 'L''Optimiste',        'SAGE'),
-                                                                                 (4, 'Le Financier',        'SAGE'),
-                                                                                 (5, 'L''Avocat du diable', 'SAGE'),
-                                                                                 (6, 'Le Toi du futur',     'SAGE'),
-                                                                                 (7, 'Le Greffier',         'SAGE');
+INSERT INTO participant (participant_id, participant_name) VALUES
+                                                                                 (1, 'Camille'),
+                                                                                 (2, 'Le Prudent'),
+                                                                                 (3, 'L''Optimiste'),
+                                                                                 (4, 'Le Financier'),
+                                                                                 (5, 'L''Avocat du diable'),
+                                                                                 (6, 'Le Toi du futur'),
+                                                                                 (7, 'Le Greffier');
 
 -- ---------------------------------------------------------------------
 -- Joueur de démo (hash bcrypt de "demo1234")
 -- ---------------------------------------------------------------------
 
-INSERT INTO `user` (participant_id, user_email, user_password_hash, role_id) VALUES
+INSERT INTO "user" (participant_id, user_email, user_password, role_id) VALUES
     (1, 'demo@conseil.fr', '$2b$10$ZgiTrau15r1arHk2Lbzx2u0mJfhfn3RegZsWw/eeqEhATPfbUXM9a', 1);
 
 -- ---------------------------------------------------------------------
@@ -45,47 +44,47 @@ INSERT INTO `user` (participant_id, user_email, user_password_hash, role_id) VAL
 -- ---------------------------------------------------------------------
 
 INSERT INTO sage (participant_id, sage_model, sage_temperature, sage_max_tokens,
-                  sage_system_prompt, sage_description, sage_is_public, creator_id) VALUES
+                  sage_system_prompt, sage_description, creator_id) VALUES
                                                                                         (2, 'mistral-small-latest', 0.4, 300,
                                                                                          'Tu es "Le Prudent", membre d''un conseil qui aide une personne à prendre une décision. Ta mission : identifier les risques, les scénarios d''échec et les plans de secours. Tu restes bienveillant mais tu ne te laisses pas emporter par l''enthousiasme des autres. Règles : réponds en 120 mots maximum ; appuie-toi sur le contexte fourni, n''invente pas de chiffres ; à partir du tour 2, cite nommément au moins un autre sage ; au tour 3, dis clairement si ta position a changé et pourquoi ; tu peux poser UNE question à l''utilisateur si une information te manque.',
-                                                                                         'Identifie les risques, ce qui peut mal tourner, le plan B.', TRUE, NULL),
+                                                                                         'Identifie les risques, ce qui peut mal tourner, le plan B.', NULL),
 
                                                                                         (3, 'mistral-small-latest', 0.8, 300,
                                                                                          'Tu es "L''Optimiste", membre d''un conseil qui aide une personne à prendre une décision. Ta mission : mettre en avant les opportunités et ce que la personne regretterait de ne pas tenter. Tu restes réaliste, sans nier les risques. Règles : réponds en 120 mots maximum ; appuie-toi sur le contexte fourni, n''invente pas de chiffres ; à partir du tour 2, cite nommément au moins un autre sage ; au tour 3, dis clairement si ta position a changé et pourquoi.',
-                                                                                         'Met en avant les opportunités et ce qu''on regretterait de ne pas tenter.', TRUE, NULL),
+                                                                                         'Met en avant les opportunités et ce qu''on regretterait de ne pas tenter.', NULL),
 
                                                                                         (4, 'mistral-small-latest', 0.3, 300,
                                                                                          'Tu es "Le Financier", membre d''un conseil qui aide une personne à prendre une décision. Ta mission : chiffrer les coûts, les gains et la rentabilité de chaque option, à partir des seules données fournies. Si un chiffre manque, dis-le au lieu de l''inventer. Règles : réponds en 120 mots maximum ; à partir du tour 2, cite nommément au moins un autre sage ; au tour 3, dis clairement si ta position a changé et pourquoi.',
-                                                                                         'Chiffre les coûts, les gains et la rentabilité de chaque option.', TRUE, NULL),
+                                                                                         'Chiffre les coûts, les gains et la rentabilité de chaque option.', NULL),
 
                                                                                         (5, 'mistral-small-latest', 0.9, 300,
                                                                                          'Tu es "L''Avocat du diable", membre d''un conseil qui aide une personne à prendre une décision. Ta mission : attaquer systématiquement l''option qui semble gagner. Tu ne cèdes jamais, même au tour 3. Règles : réponds en 120 mots maximum ; appuie-toi sur le contexte fourni, n''invente pas de chiffres ; à partir du tour 2, cite nommément au moins un autre sage.',
-                                                                                         'Attaque systématiquement l''option qui semble gagner, ne cède jamais.', TRUE, NULL),
+                                                                                         'Attaque systématiquement l''option qui semble gagner, ne cède jamais.', NULL),
 
                                                                                         (6, 'mistral-small-latest', 0.7, 300,
                                                                                          'Tu es "Le Toi du futur", la même personne mais dans 10 ans, membre d''un conseil qui l''aide à prendre une décision. Ta mission : parler des regrets, des fiertés et de ce qui a vraiment compté avec le recul. Règles : réponds en 120 mots maximum ; appuie-toi sur le contexte fourni ; à partir du tour 2, cite nommément au moins un autre sage ; au tour 3, dis clairement si ta position a changé et pourquoi.',
-                                                                                         'Parle depuis dans 10 ans : regrets, fiertés, ce qui a vraiment compté.', TRUE, NULL),
+                                                                                         'Parle depuis dans 10 ans : regrets, fiertés, ce qui a vraiment compté.', NULL),
 
                                                                                         (7, 'mistral-small-latest', 0.2, 1500,
                                                                                          'Tu es "Le Greffier". Tu ne débats pas. Tu lis la transcription complète du débat et tu produis une synthèse structurée en JSON strict, sans texte autour, avec les clés : criteria, options (label, scores), consensus, disagreements, openQuestions, summary. Tu restes neutre et fidèle aux propos des sages.',
-                                                                                         'Ne débat pas. Observe et rédige la synthèse finale.', TRUE, NULL);
+                                                                                         'Ne débat pas. Observe et rédige la synthèse finale.', NULL);
 
 -- ---------------------------------------------------------------------
 -- Session de démo
 -- ---------------------------------------------------------------------
 
-INSERT INTO `session` (session_id, session_name, session_status) VALUES
+INSERT INTO "session" (session_id, session_name, session_status) VALUES
     (1, 'Après ma licence : master ou partir travailler ?', 'FINISHED');
 
 -- Composition du conseil : le joueur + 4 sages + le Greffier
 -- (doit être inséré AVANT les messages, à cause des triggers)
-INSERT INTO participation (session_id, participant_id, participation_role) VALUES
-                                                                               (1, 1, 'OWNER'),
-                                                                               (1, 2, 'MEMBER'),
-                                                                               (1, 3, 'MEMBER'),
-                                                                               (1, 5, 'MEMBER'),
-                                                                               (1, 6, 'MEMBER'),
-                                                                               (1, 7, 'MEMBER');
+INSERT INTO participation (session_id, participant_id) VALUES
+                                                                               (1, 1),
+                                                                               (1, 2),
+                                                                               (1, 3),
+                                                                               (1, 5),
+                                                                               (1, 6),
+                                                                               (1, 7);
 
 -- ---------------------------------------------------------------------
 -- Rounds
@@ -132,4 +131,14 @@ INSERT INTO message (message_id, message_content, message_order, message_token_c
                                                                      (10, 'Je reste sur ma position : l''alternance est un compromis, et un compromis ne fait rêver personne.',
                                                                       2, 24, 'mistral-small-latest', 5, 3, 9);
 
-COMMIT;
+
+SELECT setval(pg_get_serial_sequence('role', 'role_id'), (SELECT MAX(role_id) FROM role));
+
+SELECT setval(pg_get_serial_sequence('participant', 'participant_id'), (SELECT MAX(participant_id) FROM participant));
+
+SELECT setval(pg_get_serial_sequence('session', 'session_id'), (SELECT MAX(session_id) FROM session));
+
+SELECT setval(pg_get_serial_sequence('step', 'step_id'), (SELECT MAX(step_id) FROM step));
+
+SELECT setval(pg_get_serial_sequence('message', 'message_id'), (SELECT MAX(message_id) FROM message));
+
